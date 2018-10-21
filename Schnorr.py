@@ -33,6 +33,7 @@ class Schnorr():
 
 
 
+
 group1 = IntegerGroupQ()
 scheme = Schnorr(group1, 256)
 (pk, sk) = scheme.keyGeneration()
