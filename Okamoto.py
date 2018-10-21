@@ -1,7 +1,7 @@
 from charm.toolbox.integergroup import IntegerGroupQ
 
 
-class Schnorr():
+class Okamoto():
 
     def __init__(self, groupObj, bitsize):
         global group
@@ -35,7 +35,7 @@ class Schnorr():
 
 
 group1 = IntegerGroupQ()
-scheme = Schnorr(group1, 256)
+scheme = Okamoto(group1, 256)
 (pk, sk) = scheme.keyGeneration()
 (X, x) = scheme.generateX(pk)
 c = scheme.challenge()
