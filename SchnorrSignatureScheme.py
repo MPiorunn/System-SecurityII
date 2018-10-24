@@ -1,15 +1,14 @@
 from charm.toolbox.integergroup import IntegerGroupQ
 
 
-class Prover():
+class Prover:
 
-    def __init__(self, g, a, group) -> None:
+    def __init__(self, g, a) -> None:
+        self.x = group.random()
         self.g = g
         self.a = a
-        self.group = group
 
     def sendX(self):
-        self.x = group.random()
         X = g ** self.x
         return X
 
@@ -18,15 +17,14 @@ class Prover():
         return s
 
 
-class Verifier():
+class Verifier:
 
-    def __init__(self, g, A, group):
+    def __init__(self, g, A):
+        self.c = group.random()
         self.g = g
         self.A = A
-        self.group = group
 
     def sendC(self, X):
-        self.c = group.random()
         self.X = X
         return self.c
 
@@ -40,8 +38,8 @@ group = IntegerGroupQ(1024)
 group.paramgen(1024)
 g = group.randomGen()
 a = group.random()
-prover = Prover(g, a, group)
-verifier = Verifier(g, g ** a, group)
+prover = Prover(g, a)
+verifier = Verifier(g, g ** a)
 
 X = prover.sendX()
 c = verifier.sendC(X)
