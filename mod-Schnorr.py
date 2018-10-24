@@ -1,5 +1,5 @@
 from charm.toolbox.integergroup import IntegerGroupQ
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 
 
 class ModSchnorr():
@@ -33,14 +33,14 @@ class ModSchnorr():
         return (pk['g'] ** s) == (X * pk['A'] ** c)
 
 
-group1 = PairingGroup(1024)
-scheme = ModSchnorr(group1, 256)
-(pk, sk) = scheme.keyGeneration()
-(X, x) = scheme.generateX(pk)
-c = scheme.challenge()
-s = scheme.response(x, c, sk)
-decision = scheme.verify(s, X, pk, c)
-if (decision):
-    print("GOod")
-else:
-    print("Bad")
+# group1 = IntegerGroupQ(1024)
+# scheme = ModSchnorr(group1, 256)
+# (pk, sk) = scheme.keyGeneration()
+# (X, x) = scheme.generateX(pk)
+# c = scheme.challenge()
+# s = scheme.response(x, c, sk)
+# decision = scheme.verify(s, X, pk, c)
+# if (decision):
+#     print("GOod")
+# else:
+#     print("Bad")
