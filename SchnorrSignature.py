@@ -1,48 +1,56 @@
+'''
+
+x random
+X - g^x
+c <- hash(m,X)
+s = x+ac
+sigma = (s,x)
+
+ver
+c <- hash(m,X0
+g^s =XA^c
+
+'''
 from charm.toolbox.integergroup import IntegerGroupQ
 
 
-class Prover:
+class Signer:
 
-    def __init__(self, g, a) -> None:
+    def __init__(self, g, a):
         self.x = group.random()
         self.g = g
         self.a = a
 
-    def sendX(self):
+    def getSignature(self, m):
         X = g ** self.x
-        return X
-
-    def sendS(self, c):
-        s = self.x + a * c
-        return s
+        c = group.hash(m, X)
+        s = self.x + self.a * c
+        return {'s': s, 'X': X}
 
 
 class Verifier:
 
-    def __init__(self, g, A):
-        self.c = group.random()
-        self.g = g
+    def __init__(self, A):
         self.A = A
 
-    def sendC(self, X):
-        self.X = X
-        return self.c
-
-    def verify(self, s):
-        left = self.g ** s
-        right = self.X * (self.A ** self.c)
-        return left == right
+    def verify(self, sigma, m):
+        X = sigma['X']
+        s = sigma['s']
+        c = group.hash(m, X)
+        return g ** s == X * self.A ** c
 
 
 group = IntegerGroupQ(1024)
 group.paramgen(1024)
 g = group.randomGen()
 a = group.random()
-prover = Prover(g, a)
-verifier = Verifier(g, g ** a)
 
-X = prover.sendX()
-c = verifier.sendC(X)
-s = prover.sendS(c)
+message = "Message"
+signer = Signer(g, a)
+verifier = Verifier(g ** a)
 
-print(verifier.verify(s))
+sigma = signer.getSignature(message)
+
+verified = verifier.verify(sigma, message)
+print(verified)
+
