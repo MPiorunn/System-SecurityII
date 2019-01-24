@@ -12,10 +12,10 @@ class BLS(IBSig):
     def dump(self, obj):
         return objectToBytes(obj, group)
 
-    def keygen(self, secparam=None):
+    def keygen(self):
         g, x = group.random(G2), group.random()
         g_x = g ** x
-        pk = {'g^x': g_x, 'g': g, 'identity': str(g_x), 'secparam': secparam}
+        pk = {'g^x': g_x, 'g': g, 'identity': str(g_x)}
         sk = {'x': x}
         return pk, sk
 
@@ -29,17 +29,13 @@ class BLS(IBSig):
         return pair(sig, pk['g']) == pair(h, pk['g^x'])
 
 
-def main():
-    group_obj = PairingGroup('MNT224')
-    m = "This is my secret message"
-    bls = BLS(group_obj)
-    (pk, sk) = bls.keygen()
-    sig = bls.sign(sk['x'], m)
-    ver = bls.verify(pk, sig, m)
-    if ver:
-        print("Verified")
-    else:
-        print("Not verified")
-
-
-main()
+group_obj = PairingGroup('MNT224')
+m = "This is my secret message"
+bls = BLS(group_obj)
+(pk, sk) = bls.keygen()
+sig = bls.sign(sk['x'], m)
+ver = bls.verify(pk, sig, m)
+if ver:
+    print("Verified")
+else:
+    print("Not verified")
