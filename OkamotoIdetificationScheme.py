@@ -3,14 +3,16 @@ from charm.toolbox.integergroup import IntegerGroupQ
 
 class Prover:
 
-    def __init__(self, a1, a2) -> None:
+    def __init__(self, sk) -> None:
         self.x1 = group.random()
         self.x2 = group.random()
-        self.a1 = a1
-        self.a2 = a2
+        self.a1 = sk['a1']
+        self.a2 = sk['a2']
+        self.g1 = sk['g1']
+        self.g2 = sk['g2']
 
     def sendX(self):
-        X = g1 ** self.x1 * g2 ** self.x2
+        X = self.g1 ** self.x1 * self.g2 ** self.x2
         return X
 
     def sendS(self, c):
@@ -21,29 +23,37 @@ class Prover:
 
 class Verifier:
 
-    def __init__(self, A):
+    def __init__(self, pk):
         self.c = group.random()
-        self.A = A
+        self.A = pk['A']
+        self.g1 = pk['g1']
+        self.g2 = pk['g2']
 
     def sendC(self, X):
         self.X = X
         return self.c
 
     def verify(self, s1, s2):
-        left = (g1 ** s1) * (g2 ** s2)
+        left = (self.g1 ** s1) * (self.g2 ** s2)
         right = X * (self.A ** c)
         return left == right
 
 
+def keygen():
+    g1 = group.randomGen()
+    g2 = group.randomGen()
+    a1 = group.random()
+    a2 = group.random()
+    sk = {'g1': g1, 'g2': g2, 'a1': a1, 'a2': a2}
+    pk = {'g1': g1, 'g2': g2, 'A': (g1 ** a1) * (g2 ** a2)}
+    return pk, sk
+
+
 group = IntegerGroupQ(1024)
 group.paramgen(1024)
-g1 = group.randomGen()
-g2 = group.randomGen()
-a1 = group.random()
-a2 = group.random()
-
-prover = Prover(a1, a2)
-verifier = Verifier((g1 ** a1) * (g2 ** a2))
+(pk, sk) = keygen()
+prover = Prover(sk)
+verifier = Verifier(pk)
 
 X = prover.sendX()
 c = verifier.sendC(X)

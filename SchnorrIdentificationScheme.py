@@ -3,26 +3,26 @@ from charm.toolbox.integergroup import IntegerGroupQ
 
 class Prover:
 
-    def __init__(self, g, a) -> None:
+    def __init__(self, sk) -> None:
         self.x = group.random()
-        self.g = g
-        self.a = a
+        self.g = sk['g']
+        self.a = sk['a']
 
     def sendX(self):
-        X = g ** self.x
+        X = self.g ** self.x
         return X
 
     def sendS(self, c):
-        s = self.x + a * c
+        s = self.x + self.a * c
         return s
 
 
 class Verifier:
 
-    def __init__(self, g, A):
+    def __init__(self, pk):
         self.c = group.random()
-        self.g = g
-        self.A = A
+        self.g = pk['g']
+        self.A = pk['A']
 
     def sendC(self, X):
         self.X = X
@@ -34,12 +34,19 @@ class Verifier:
         return left == right
 
 
+def keygen():
+    g = group.randomGen()
+    a = group.random()
+    sk = {'g': g, 'a': a}
+    pk = {'g': g, 'A': g ** a}
+    return pk, sk
+
+
 group = IntegerGroupQ(1024)
 group.paramgen(1024)
-g = group.randomGen()
-a = group.random()
-prover = Prover(g, a)
-verifier = Verifier(g, g ** a)
+(pk, sk) = keygen()
+prover = Prover(sk)
+verifier = Verifier(pk)
 
 X = prover.sendX()
 c = verifier.sendC(X)
