@@ -1,16 +1,3 @@
-'''
-
-x random
-X - g^x
-c <- hash(m,X)
-s = x+ac
-sigma = (s,x)
-
-ver
-c <- hash(m,X0
-g^s =XA^c
-
-'''
 from charm.toolbox.integergroup import IntegerGroupQ
 
 
@@ -21,7 +8,7 @@ class Signer:
         self.g = g
         self.a = a
 
-    def getSignature(self, m):
+    def sign(self, m):
         X = g ** self.x
         c = group.hash(m, X)
         s = self.x + self.a * c
@@ -49,8 +36,7 @@ message = "Message"
 signer = Signer(g, a)
 verifier = Verifier(g ** a)
 
-sigma = signer.getSignature(message)
+sigma = signer.sign(message)
 
 verified = verifier.verify(sigma, message)
 print(verified)
-
