@@ -31,11 +31,12 @@ class Verifier:
         return self.c
 
     def verify(self, S):
-        l = pair(S, self.g)
-        b = self.X * self.c
-        h = group.hash(b, G1)
-        p = pair(h, self.X * self.A ** c)
-        return l == p
+        left = pair(S, self.g)
+
+        h = group.hash((self.X * self.c), G1)
+        right = pair(h, self.X * self.A ** c)
+
+        return left == right
 
 
 def keygen():
