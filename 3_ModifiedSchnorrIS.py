@@ -26,13 +26,12 @@ class Verifier:
         self.A = pk['A']
 
     def sendC(self, X):
-        self.c = group.random()
         self.X = X
         return self.c
 
     def verify(self, S):
+        self.c = group.random()
         left = pair(S, self.g)
-
         h = group.hash((self.X * self.c), G1)
         right = pair(h, self.X * self.A ** c)
 

@@ -20,12 +20,12 @@ class Prover:
 class Verifier:
 
     def __init__(self, pk):
-        self.c = group.random()
         self.g = pk['g']
         self.A = pk['A']
 
     def sendC(self, X):
         self.X = X
+        self.c = group.random()
         return self.c
 
     def verify(self, s):

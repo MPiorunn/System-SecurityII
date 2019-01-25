@@ -24,13 +24,13 @@ class Prover:
 class Verifier:
 
     def __init__(self, pk):
-        self.c = group.random()
         self.A = pk['A']
         self.g1 = pk['g1']
         self.g2 = pk['g2']
 
     def sendC(self, X):
         self.X = X
+        self.c = group.random()
         return self.c
 
     def verify(self, s1, s2):
