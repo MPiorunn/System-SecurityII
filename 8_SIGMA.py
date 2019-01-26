@@ -19,27 +19,31 @@ class Alice:
         self.K_0 = group.hash(self.K, 0)
         self.K_1 = group.hash(self.K, 1)
         self.mac = group.hash(self.ID_a, self.K_0)
-        if self.checkMac(bob_data): #and self.verifySig(bob_data):
-            # self.sig = self.sign(bob_data, self.g ** self.x)
+        if self.checkMac(bob_data) and self.verifySig(bob_data):
+            self.sig = self.sign(self.g ** self.x, bob_data['Y'])
             self.Ks = self.K_1
-            return {'X': self.g ** self.x, 'ID_a': self.ID_a, 'sig': "XD", 'mac': self.mac}
-
-    # def sign(self, g_x, g_y):
-    #     X = self.g ** self.x
-    #     c = group.hash(g_x, g_y, X)
-    #     s = self.x + self.a * c
-    #     return {'s': s, 'X': X}
+            return {'X': self.g ** self.x, 'ID_a': self.ID_a, 'sig': self.sig, 'mac': self.mac}
 
     def checkMac(self, bob_data):
         mac = group.hash(bob_data['ID_b'], self.K_0)
-        return self.mac == mac
+        return bob_data['mac'] == mac
 
-    # def verifySig(self, bob_data):
-    #     sig = bob_data['sig']
-    #     X = sig['X']
-    #     s = sig['s']
-    #     c = group.hash(self.g ** self.x, bob_data['Y'])
-    #     return self.g ** s == X * (self.g ** self.a) ** c
+    def verifySig(self, bob_data):
+        sig = bob_data['sig']
+        X = sig['X']
+        s = sig['s']
+        c = group.hash(self.g ** self.x, bob_data['Y'], X)
+        return self.g ** s == X * self.pk['B'] ** c
+
+    def sign(self, g_x, g_y):
+        x = group.random()
+        X = self.g ** x
+        c = group.hash(g_x, g_y, X)
+        s = x + self.a * c
+        return {'s': s, 'X': X}
+
+    def getSessionKey(self):
+        return self.Ks
 
 
 class Bob:
@@ -56,40 +60,36 @@ class Bob:
         self.K_0 = group.hash(self.K, 0)
         self.K_1 = group.hash(self.K, 1)
         self.mac = group.hash(self.ID_b, self.K_0)
-        # sig = self.sign(X, self.g ** self.y)
-        return {'Y': self.g ** self.y, 'ID_b': self.ID_b, 'sig': "xD", 'mac': self.mac}
+        sig = self.sign(X, self.g ** self.y)
+        return {'Y': self.g ** self.y, 'ID_b': self.ID_b, 'sig': sig, 'mac': self.mac}
 
-    # def sign(self, g_x, g_y):
-    #     X = self.g ** self.y
-    #     c = group.hash(g_x, g_y, X)
-    #     s = self.y + self.b * c
-    #     return {'s': s, 'X': X}
+    def sign(self, g_x, g_y):
+        x = group.random()
+        X = self.g ** x
+        c = group.hash(g_x, g_y, X)
+        s = x + self.b * c
+        return {'s': s, 'X': X}
 
     def calculateKey(self, alice_data):
         self.K = alice_data['X'] ** self.y
         self.K_0 = group.hash(self.K, 0)
         self.K_1 = group.hash(self.K, 1)
-        # if self.checkMac(alice_data):#and self.verifySig(alice_data):
-            # self.Ks = self.K1
-
+        if self.checkMac(alice_data) and self.verifySig(alice_data):
+            self.Ks = self.K_1
 
     def checkMac(self, alice_data):
-        mac = group.hash(alice_data['ID_b'], self.K_0)
-        return self.mac == mac
+        mac = group.hash(alice_data['ID_a'], self.K_0)
+        return alice_data['mac'] == mac
 
-    # def verifySig(self, alice_data):
-    #     sig = alice_data['sig']
-    #     X = sig['X']
-    #     s = sig['s']
-    #     c = group.hash(self.g ** self.x, alice_data['Y'])
-    #     return self.g ** s == X * (self.g ** self.b) ** c
+    def verifySig(self, alice_data):
+        sig = alice_data['sig']
+        X = sig['X']
+        s = sig['s']
+        c = group.hash(alice_data['X'], self.g ** self.y, X)
+        return self.g ** s == X * self.pk['A'] ** c
 
-    def calculateSessionKey(self, X):
-        arg1 = self.pk['A'] ** (group.hash(self.y, self.b))
-        arg2 = X ** self.b
-        arg3 = X ** group.hash(self.y, self.b)
-        Kb = group.hash(arg1, arg2, arg3)
-        return Kb
+    def getSessionKey(self):
+        return self.Ks
 
 
 def keygen():
@@ -114,3 +114,5 @@ bob_data = bob.sendData(X)
 alice_data = alice.sendData(bob_data)
 
 bob.calculateKey(alice_data)
+
+print(alice.getSessionKey() == bob.getSessionKey())

@@ -4,14 +4,14 @@ from charm.toolbox.integergroup import IntegerGroupQ
 class Signer:
 
     def __init__(self, sk):
-        self.x = group.random()
         self.g = sk['g']
         self.a = sk['a']
 
     def sign(self, m):
-        X = self.g ** self.x
+        x = group.random()
+        X = self.g ** x
         c = group.hash(m, X)
-        s = self.x + self.a * c
+        s = x + self.a * c
         return {'s': s, 'X': X}
 
 
