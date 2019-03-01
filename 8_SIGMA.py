@@ -19,7 +19,7 @@ class Alice:
         self.K_0 = group.hash(self.K, 0)
         self.K_1 = group.hash(self.K, 1)
         self.mac = group.hash(self.ID_a, self.K_0)
-        if self.checkMac(bob_data) and self.verifySig(bob_data):
+        if self.checkMac(bob_data) and self.verifySignature(bob_data):
             self.sig = self.sign(self.g ** self.x, bob_data['Y'])
             self.Ks = self.K_1
             return {'X': self.g ** self.x, 'ID_a': self.ID_a, 'sig': self.sig, 'mac': self.mac}
@@ -28,7 +28,7 @@ class Alice:
         mac = group.hash(bob_data['ID_b'], self.K_0)
         return bob_data['mac'] == mac
 
-    def verifySig(self, bob_data):
+    def verifySignature(self, bob_data):
         sig = bob_data['sig']
         X = sig['X']
         s = sig['s']
@@ -74,14 +74,14 @@ class Bob:
         self.K = alice_data['X'] ** self.y
         self.K_0 = group.hash(self.K, 0)
         self.K_1 = group.hash(self.K, 1)
-        if self.checkMac(alice_data) and self.verifySig(alice_data):
+        if self.checkMac(alice_data) and self.verifySignature(alice_data):
             self.Ks = self.K_1
 
     def checkMac(self, alice_data):
         mac = group.hash(alice_data['ID_a'], self.K_0)
         return alice_data['mac'] == mac
 
-    def verifySig(self, alice_data):
+    def verifySignature(self, alice_data):
         sig = alice_data['sig']
         X = sig['X']
         s = sig['s']
